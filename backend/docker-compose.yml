@@ -1,0 +1,36 @@
+services:
+
+  webapi:
+    build: 
+      context: .
+      dockerfile: ./src/Gol.WebApi/Dockerfile
+    user: app
+    container_name: webapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - '5001:8080'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/application"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+        - gol-network
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql
+    ports:
+      - '1433:1433'
+    environment:
+      - MSSQL_SA_PASSWORD=A6h4BwY6cgN7
+      - ACCEPT_EULA=Y
+    restart: unless-stopped
+    networks:
+        - gol-network
+
+networks:
+  gol-network:
+    driver: bridge
